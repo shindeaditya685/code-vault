@@ -23,9 +23,10 @@ type Props = {
   id: string;
   title: string;
   description: string;
+  pathname: string;
 };
 
-const MarkdownCard = ({ id, title, description }: Props) => {
+const MarkdownCard = ({ id, title, description, pathname }: Props) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
@@ -52,7 +53,7 @@ const MarkdownCard = ({ id, title, description }: Props) => {
 
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push(`/code-snippets/edit/${id}`);
+    router.push(`/${pathname}/edit/${id}`);
   };
 
   return (

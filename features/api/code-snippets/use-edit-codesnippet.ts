@@ -26,6 +26,7 @@ export const useEditCodesnippet = () => {
     mutationFn: editCodesnippet,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["codeSnippet"] });
+      queryClient.invalidateQueries({ queryKey: ["codeSnippets"] });
 
       // Show success toast
       toast({

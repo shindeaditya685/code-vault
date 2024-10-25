@@ -51,6 +51,7 @@ const CodeSnippetsPage = () => {
               id={snippet.id}
               title={snippet.title}
               description={snippet.content}
+              pathname="code-snippets"
             />
           ))}
         </div>

@@ -9,7 +9,7 @@ const fetchProjectDocs = async (): Promise<ProjectsDocs> => {
 
 export const useGetProjectDocs = () => {
   return useQuery({
-    queryKey: ["codeSnippet"],
+    queryKey: ["projects"],
     queryFn: fetchProjectDocs,
     retry: false,
     refetchOnWindowFocus: false,

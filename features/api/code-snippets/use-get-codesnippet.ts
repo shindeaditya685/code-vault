@@ -1,28 +1,18 @@
-import api from "@/lib/api";
-import { CodeSnippets } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
+import { CodeSnippets } from "@prisma/client";
+import axios from "axios";
 
-
-
-const fetchCodesnippet = async (id: string): Promise<CodeSnippets> => {
-  const response = await api.post(
-    "/code-snippets/get-by-id",
-    { id },
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+const fetchCodeSnippet = async (id: string): Promise<CodeSnippets> => {
+  const response = await axios.post("/api/code-snippets/get-by-id", { id });
   return response.data;
 };
 
-export const useGetCodesnippet = (id: string) => {
-  return useQuery<CodeSnippets>({
-    queryKey: ["codeSnippet"],
-    queryFn: () => fetchCodesnippet(id),
+export const useGetCodeSnippet = (id: string | undefined) => {
+  return useQuery({
+    queryKey: ["codeSnippet", id],
+    queryFn: () => fetchCodeSnippet(id!),
     enabled: !!id,
-    retry: false,
-    refetchOnWindowFocus: false,
+    retry: 1,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 };

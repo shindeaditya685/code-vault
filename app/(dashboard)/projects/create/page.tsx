@@ -4,7 +4,7 @@ import MarkdownEditor from "@/components/markdown-editor";
 import {
   CreateProjectDocsDTO,
   useCreateProjectDocs,
-} from "@/features/project-docs/use-create-project-docs";
+} from "@/features/api/project-docs/use-create-project-docs";
 
 const CreatePage = () => {
   const mutation = useCreateProjectDocs();

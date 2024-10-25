@@ -2,45 +2,43 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
-import { CodeSnippets } from "@prisma/client";
+import { ProjectsDocs } from "@prisma/client";
 
-export type EditCodeSnippetDTO = {
+export type EditProjectDocsDTO = {
   id: string;
   title: string;
   content: string;
 };
 
-const editCodesnippet = async (
-  data: EditCodeSnippetDTO
-): Promise<CodeSnippets> => {
-  const response = await api.put<CodeSnippets>("/code-snippets", data);
+const editProjectDoc = async (
+  data: EditProjectDocsDTO
+): Promise<ProjectsDocs> => {
+  const response = await api.put<ProjectsDocs>("/projects-docs", data);
   return response.data;
 };
 
-export const useEditCodesnippet = () => {
+export const useEditProjectDoc = () => {
   const router = useRouter();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: editCodesnippet,
+    mutationFn: editProjectDoc,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["codeSnippet"] });
-      queryClient.invalidateQueries({ queryKey: ["codeSnippets"] });
-
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
       // Show success toast
       toast({
         title: "Success!",
-        description: "Codesnippet edited successfully",
+        description: "Project edited successfully",
       });
 
       // Navigate back to the list
-      router.push("/code-snippets");
+      router.push("/projects");
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to edit Codesnippet",
+        description: error.message || "Failed to edit Project.",
         variant: "destructive",
       });
     },

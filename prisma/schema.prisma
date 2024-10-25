@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model CodeSnippets {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  title     String
+  content   String
+  isEdited  Boolean? @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProjectsDocs {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  title     String 
+  content   String
+  isEdited  Boolean? @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Bookmarks {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  title     String
+  link      String
+  isEdited  Boolean? @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

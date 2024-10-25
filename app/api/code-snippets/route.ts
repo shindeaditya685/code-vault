@@ -119,6 +119,19 @@ export async function PUT(req: NextRequest) {
       },
     });
 
+    const vectorService = VectorEmbeddingService.getInstance();
+    const combinedText = `${title} ${content}`;
+    const embedding = await vectorService.createEmbedding(combinedText);
+
+    await vectorService.storeEmbedding({
+      id: codeSnippet.id,
+      embedding,
+      metadata: {
+        title,
+        content,
+      },
+    });
+
     return NextResponse.json(updatedCodeSnippet, { status: 200 });
   } catch (error) {
     console.error("[UPDATE CODE SNIPPET ERROR]", error);

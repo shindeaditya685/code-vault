@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
+import { VectorEmbeddingService } from "@/utils";
 
 // GET - Fetch bookmarks for a user
 export async function GET(req: NextRequest) {
@@ -48,6 +49,19 @@ export async function POST(req: NextRequest) {
     const codeSnippet = await db.bookmarks.create({
       data: {
         userId,
+        title,
+        link,
+      },
+    });
+
+    const vectorService = VectorEmbeddingService.getInstance();
+    const combinedText = `${title} ${link}`;
+    const embedding = await vectorService.createEmbedding(combinedText);
+
+    await vectorService.storeEmbedding({
+      id: codeSnippet.id,
+      embedding,
+      metadata: {
         title,
         link,
       },
@@ -102,6 +116,19 @@ export async function PUT(req: NextRequest) {
         title,
         link,
         isEdited: true,
+      },
+    });
+
+    const vectorService = VectorEmbeddingService.getInstance();
+    const combinedText = `${title} ${link}`;
+    const embedding = await vectorService.createEmbedding(combinedText);
+
+    await vectorService.storeEmbedding({
+      id: codeSnippet.id,
+      embedding,
+      metadata: {
+        title,
+        link,
       },
     });
 

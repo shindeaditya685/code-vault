@@ -22,7 +22,7 @@ const SidebarContent: React.FC = () => {
     {
       id: 1,
       href: "/code-snippets",
-      subHref1: "/code-snippets/create",
+      subHref1: "/code-snippets/create/",
       subHref2: "/code-snippets/edit/",
       label: "Code Snippets",
       icon: <Code className="mr-3" />,
@@ -30,6 +30,8 @@ const SidebarContent: React.FC = () => {
     {
       id: 2,
       href: "/projects",
+      subHref1: "/projects/create/",
+      subHref2: "/projects/edit/",
       label: "Projects",
       icon: <Folder className="mr-3" />,
     },

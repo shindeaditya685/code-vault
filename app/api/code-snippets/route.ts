@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
+import { VectorEmbeddingService } from "@/utils";
 
 // GET - Fetch code snippets for a user
 export async function GET(req: NextRequest) {
@@ -48,6 +49,19 @@ export async function POST(req: NextRequest) {
     const codeSnippet = await db.codeSnippets.create({
       data: {
         userId,
+        title,
+        content,
+      },
+    });
+
+    const vectorService = VectorEmbeddingService.getInstance();
+    const combinedText = `${title} ${content}`;
+    const embedding = await vectorService.createEmbedding(combinedText);
+
+    await vectorService.storeEmbedding({
+      id: codeSnippet.id,
+      embedding,
+      metadata: {
         title,
         content,
       },

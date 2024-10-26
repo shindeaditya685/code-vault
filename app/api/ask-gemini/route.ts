@@ -31,57 +31,55 @@ const fallbackInfo = `You are a helpful AI assistant. The specific details reque
 2. **Code Snippets**: If the user requested code, offer an overview of a relevant solution or code concept, using code blocks (\`\`\`) if possible.
 3. **Encouraging Tone**: If additional detail might be found elsewhere, kindly suggest resources or recommend follow-up queries.`;
 
-export async function POST(req: Request, res: Response) {
+export async function POST(req: Request) {
   const reqBody = await req.json();
-  console.log(reqBody);
+  console.log("Request Body:", reqBody);
 
   const messages: Message[] = reqBody.messages;
-  const userQuestion = `${messages[messages.length - 1].content}`;
+  const userQuestion = messages[messages.length - 1].content;
 
-  const query = `Represent this for searching relevant information: ${userQuestion}`;
+  try {
+    const retrievals = await queryPineconeVectorStore(
+      pinecone,
+      process.env.PINECONE_INDEX_NAME!,
+      "code-snippets",
+      userQuestion // Using the direct question for better search relevance
+    );
 
-  const retrievals = await queryPineconeVectorStore(
-    pinecone,
-    process.env.PINECONE_INDEX_NAME!,
-    "code-snippets",
-    query
-  );
+    console.log("Retrievals:", retrievals);
 
-  console.log("retrivals: ", retrievals);
+    const finalPrompt = `You are a helpful AI assistant for Wadia College of Engineering's website. You should explain code snippets, documentation, and provide helpful context.
 
-  const finalPrompt = `You are a helpful AI assistant for Wadia College of Engineering's website, designed to assist users by providing project documentation, code snippets, or bookmarks/links, and explaining them clearly. Format all responses in Markdown for enhanced readability and structure.
+User Question: ${userQuestion}
 
-\n\n**User Request:**\n${query}
-\n**End of User Request**
+Retrieved Information:
+${retrievals !== "<no relevant information found>" ? retrievals : fallbackInfo}
 
-\n\n**Relevant Information:**
-\n\n${
-    retrievals !== "<no relevant information found>" ? retrievals : fallbackInfo
+Instructions:
+1. If code is present in the retrieved information, explain what it does and how to use it
+2. Include any important implementation details or requirements
+3. Suggest best practices related to the implementation
+4. If the retrieved code is partial, mention what else might be needed
+5. Format your response in Markdown for readability
+
+Response:`;
+
+    const data = new StreamData();
+    data.append({
+      retrievals: retrievals,
+    });
+
+    const result = await streamText({
+      model: model,
+      prompt: finalPrompt,
+      onFinish() {
+        data.close();
+      },
+    });
+
+    return result.toDataStreamResponse({ data });
+  } catch (error) {
+    console.error("Error in POST handler:", error);
+    return new Response("Internal Server Error", { status: 500 });
   }
-
-\n\n**Instructions for Answer Formatting:**
-1. **Clear Explanations**: Provide concise and friendly explanations. Use Markdown headings (##), bullet points (-), or numbered lists to organize information.
-2. **Code Snippets**: If sharing code, use Markdown code blocks (\`\`\`) with appropriate syntax highlighting for readability.
-3. **Documentation**: For project documentation requests, present content in sections (e.g., Introduction, Objectives, Steps) with appropriate headers and formatting.
-4. **Bookmarks/Links**: When asked for bookmarks or links, present each with a brief description and the correct Markdown link syntax ([Link Text](URL)).
-5. **Missing Data**: If specific requested details are unavailable, provide general information and suggest other resources where applicable.
-
-\n\n**Answer (in Markdown format):**
-`;
-
-  const data = new StreamData();
-
-  data.append({
-    retrievals: retrievals,
-  });
-
-  const result = await streamText({
-    model: model,
-    prompt: finalPrompt,
-    onFinish() {
-      data.close();
-    },
-  });
-
-  return result.toDataStreamResponse({ data });
 }

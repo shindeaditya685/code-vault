@@ -1,11 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
 import { VectorEmbeddingService } from "@/utils";
+import { runMiddleware } from "@/lib/cors-middleware";
+import { MiddlewareFunction } from "@/types/cors";
+import Cors from "cors";
+
+const cors = Cors({
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  origin: ["https://code-vault-phsy1cuom-shindeaditya685s-projects.vercel.app"],
+  credentials: true,
+}) as MiddlewareFunction;
 
 // GET - Fetch code snippets for a user
 export async function GET(req: NextRequest) {
   try {
+    const response = new NextResponse();
+    await runMiddleware(req as any, response as any, cors);
     const { userId } = getAuth(req);
 
     if (!userId) {
@@ -30,6 +42,9 @@ export async function GET(req: NextRequest) {
 // POST - Create a new code snippet
 export async function POST(req: NextRequest) {
   try {
+    const response = new NextResponse();
+    await runMiddleware(req as any, response as any, cors);
+
     const { userId } = getAuth(req);
 
     if (!userId) {
@@ -80,6 +95,8 @@ export async function POST(req: NextRequest) {
 // PUT - Update a code snippet
 export async function PUT(req: NextRequest) {
   try {
+    const response = new NextResponse();
+    await runMiddleware(req as any, response as any, cors);
     const { userId } = getAuth(req);
 
     if (!userId) {
@@ -145,6 +162,8 @@ export async function PUT(req: NextRequest) {
 // DELETE - Remove a code snippet
 export async function DELETE(req: NextRequest) {
   try {
+    const response = new NextResponse();
+    await runMiddleware(req as any, response as any, cors);
     const { userId } = getAuth(req);
 
     if (!userId) {

@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL:
-    "https://code-vault-4ofeghaaj-shindeaditya685s-projects.vercel.app/api",
+  baseURL: "/api",
 });
 
 export default api;
